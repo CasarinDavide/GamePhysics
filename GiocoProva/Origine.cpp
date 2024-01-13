@@ -37,14 +37,14 @@ void initGame()
             if ((event.type == Event::KeyPressed) && (event.key.code == Keyboard::Escape))
                 window.close();
 
-            // comandi spostamento
-            mov.movement(event);
+            // enable player movement by passing event
+            mov.movementController(event);
         }
 
-        // check if the player is respecting constrains
-        mov.updatePlayer();
-
+        
+        mov.movement();
         // render
+        
         window.clear();
         window.draw(mov.getTarget());
         window.display();

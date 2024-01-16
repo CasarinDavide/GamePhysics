@@ -14,22 +14,26 @@ class Movement
         
 
     private:
+
         T target;
-        void isJumping();
-        bool touching_ground = true;
         sf::Vector2f position;
         sf::Vector2f velocity;
         sf::Vector2f acceleration;
-        float delta = 2;
 
+        float x_left_constrains = 0;
+        float x_right_constrains = 0;
+        float y_botton_constrains = 0;
+        float y_up_constrains = 0;
+
+
+        bool touching_ground = true; 
         bool left_key_pressed = false;
         bool right_key_pressed = false;
-        bool down_key_pressed = false;
-        bool up_key_pressed = false;
         bool jumping = false;
 
-};
+        void isJumping();
 
+};
 
 
 template<typename T>
@@ -47,7 +51,7 @@ void Movement<T>::isJumping()
         this->position.y = this->position.y - this->velocity.y;
     }
 
-    if (this->position.y == 360)
+    if (this->position.y == this->y_botton_constrains)
     {
         this->velocity.y = 40;
         touching_ground = true;
@@ -73,16 +77,6 @@ void Movement<T>::movementController(const sf::Event& e)
             this->right_key_pressed = true;
         }
         
-        if (e.key.code == sf::Keyboard::Up)
-        {
-            this->up_key_pressed = true;
-        }
-        
-        if (e.key.code == sf::Keyboard::Down)
-        {
-            this->down_key_pressed = true;
-        }
-        
         if (e.key.code == sf::Keyboard::Space && touching_ground)
         {
             this->touching_ground = false;
@@ -102,17 +96,7 @@ void Movement<T>::movementController(const sf::Event& e)
         {
             this->right_key_pressed = false;
         }
-        
-        if (e.key.code == sf::Keyboard::Up)
-        {
-            this->up_key_pressed = false;
-        }
-        
-        if (e.key.code == sf::Keyboard::Down)
-        {
-            this->down_key_pressed = false;
-        }
-        
+         
         if (e.key.code == sf::Keyboard::Space)
         {
             this->jumping = false;
@@ -124,24 +108,14 @@ template<typename T>
 void Movement<T>::movement()
 {
     // MOVEMENTS
-    if (this->left_key_pressed)
+    if (this->left_key_pressed && ( this->position.x - (this->velocity.x) >= this->x_left_constrains))
     {
         this->position.x = this->position.x - (this->velocity.x);
     }
 
-    if (this->right_key_pressed)
+    if (this->right_key_pressed && (this->position.x + (this->velocity.x) <= this->x_right_constrains))
     {
         this->position.x = this->position.x + (this->velocity.x);
-    }
-
-    if (this->up_key_pressed)
-    {
-        this->position.y = this->position.y - (this->velocity.y);
-    }
-
-    if (this->down_key_pressed)
-    {
-        this->position.y = this->position.y + (this->velocity.y);
     }
 
     this->isJumping();
@@ -153,9 +127,15 @@ void Movement<T>::movement()
 template<typename T>
 Movement<T>::Movement(T& target)
 {
-    this->position = sf::Vector2f(640.f, 360.f);
+    this->y_up_constrains = 700;
+    this->y_botton_constrains = 560;
+    this->x_left_constrains = 0;
+    this->x_right_constrains = 1180;
+
+
+    this->position = sf::Vector2f(640.f, 560.f);
     this->target = target;
-    this->target.setSize(sf::Vector2f(100.f, 100.f));
+    //this->target.setSize(sf::Vector2f(100.f, 100.f));
     this->target.setPosition(this->position);
 
     this->velocity = sf::Vector2f(10.0f, 40.0f);

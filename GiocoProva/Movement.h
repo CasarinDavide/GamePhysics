@@ -97,7 +97,7 @@ void Movement<T>::movementController(const sf::Event& e)
             this->right_key_pressed = false;
         }
          
-        if (e.key.code == sf::Keyboard::Space)
+        if (e.key.code == sf::Keyboard::Space && touching_ground )
         {
             this->jumping = false;
         }

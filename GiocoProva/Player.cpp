@@ -1,28 +1,139 @@
+
 #include "Player.h"
+#include "Movement.h" 
 
 
-Player::Player(sf::Vector2f default_velocity, sf::Vector2f default_acceleration, sf::Vector2f default_position,sf::String path)
+Player::Player(sf::Vector2f velocity, sf::Vector2f acceleration, sf::Vector2f position, std::string path)
 {
-	sf::Texture player_texture;
-	if (!player_texture.loadFromFile(path))
+	sf::Texture* player_texture = new sf::Texture();
+	if (!player_texture->loadFromFile(path))
 	{
-		throw __std_exception_data();
+		throw std::runtime_error("Failed to load player texture from file");
 	}
 
-	this->act_position = this->act_position = default_position;
-	this->act_acceleration = this->default_acceleration = default_acceleration;
-	this->act_velocity = this->default_velocity  = default_velocity;
-	
-	/* TODO implement a method that given any image it fits on the player */
-	this->player_image.setTexture(player_texture);
-	this->player_image.setScale(0.1f, 0.1f);
+	this->position = position;
+	this->acceleration = acceleration;
+	this->velocity = velocity;
+	this->player_image = new sf::Sprite();
 
-	this->mov = new Movement<Player>(*this);
+	this->player_image->setTexture(*player_texture);
+	sf::Vector2i texture_pos(0.f, 0.f);
+	this->player_image->setTextureRect(sf::IntRect(texture_pos, sf::Vector2i(96.0f, 71.f)));
+	this->player_image->setPosition(this->position);
+	this->mov = new Movement<Player>(*this); 
 
 }
 
 void Player::playerAction(sf::Event& event)
 {
 	this->mov->movementController(event);
+}
+
+
+void Player::move()
+{
 	this->mov->movement();
+}
+
+Player::Player(Player&& pl)
+{
+
+}
+
+Player::Player(Player& pl)
+{
+
+}
+
+Player::Player()
+{
+
+}
+
+const sf::Vector2f& Player::getVelocity()
+{
+	return this->velocity;
+}
+void Player::setVelocity(const sf::Vector2f& velocity)
+{
+	this->velocity = velocity;
+}
+
+const sf::Vector2f& Player::getAcceleration()
+{
+	return this->acceleration;
+}
+
+void Player::setAcceleration(const sf::Vector2f& acceleration)
+{
+	this->acceleration = acceleration;
+}
+
+const sf::Vector2f& Player::getPosition()
+{
+	return this->position;
+}
+
+void Player::setPosition(const sf::Vector2f& position)
+{
+	this->position.x = position.x;
+	this->position.y = position.y;
+	this->player_image->setPosition(this->position);
+}
+
+const bool Player::isTouchingGround()
+{
+	return this->touching_ground;
+}
+const bool Player::isLeftKeyPressed()
+{
+	return this->left_key_pressed;
+}
+const bool Player::isRightKeyPressed()
+{
+	return this->right_key_pressed;
+}
+const bool Player::isJumping()
+{
+	return this->jumping;
+}
+
+
+void Player::setTouchingGround(const bool touching_ground)
+{
+	this->touching_ground = touching_ground;
+}
+void Player::setLeftKeyPressed(const bool left_key_pressed)
+{
+	this->left_key_pressed = left_key_pressed;
+}
+void Player::setRightKeyPressed(const bool right_key_pressed)
+{
+	this->right_key_pressed = right_key_pressed;
+}
+void Player::setJumping(const bool jumping)
+{
+	this->jumping = jumping;
+}
+
+Player& Player::operator=(const Player& pl)
+{
+	if (&pl != this)
+	{
+		this->acceleration = pl.acceleration;
+		this->velocity = pl.velocity;
+		this->jumping = pl.jumping;
+		this->position = pl.position;
+		this->left_key_pressed = pl.left_key_pressed;
+		this->right_key_pressed = pl.right_key_pressed;
+		this->mov = pl.mov;
+		this->player_image = pl.player_image;
+	}
+
+	return *this;
+}
+
+sf::Sprite& Player::getSprite()
+{
+	return *this->player_image;
 }

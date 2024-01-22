@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="Movement.cpp" />
     <ClCompile Include="Origine.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Movement.h" />

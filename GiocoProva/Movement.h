@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+
 template<typename T>
 class Movement
 {
@@ -15,21 +16,11 @@ class Movement
 
     private:
 
-        T target;
-        sf::Vector2f position;
-        sf::Vector2f velocity;
-        sf::Vector2f acceleration;
-
+        T* target;
         float x_left_constrains = 0;
         float x_right_constrains = 0;
         float y_botton_constrains = 0;
         float y_up_constrains = 0;
-
-
-        bool touching_ground = true; 
-        bool left_key_pressed = false;
-        bool right_key_pressed = false;
-        bool jumping = false;
 
         void isJumping();
 
@@ -39,23 +30,18 @@ class Movement
 template<typename T>
 void Movement<T>::isJumping()
 {
-    if (this->jumping)
+    if (this->target->isJumping() || (!this->target->isTouchingGround() && !this->target->isJumping()))
     {
-        this->velocity.y = this->velocity.y - 4;
-        this->position.y = this->position.y - this->velocity.y;
+        this->target->setVelocity(std::move(this->target->getVelocity() - sf::Vector2f(0,4.f)));
+        this->target->setPosition(std::move(this->target->getPosition()- sf::Vector2f(0, this->target->getVelocity().y)));
     }
 
-    if (!this->touching_ground && !this->jumping)
-    {
-        this->velocity.y = this->velocity.y - 4;
-        this->position.y = this->position.y - this->velocity.y;
-    }
 
-    if (this->position.y == this->y_botton_constrains)
+    if (this->target->getPosition().y == this->y_botton_constrains)
     {
-        this->velocity.y = 40;
-        touching_ground = true;
-        this->jumping = false;
+        this->target->setVelocity(std::move(sf::Vector2f(3, 40)));
+        this->target->setTouchingGround(true);
+        this->target->setJumping(false);
     }
 
 }
@@ -70,18 +56,18 @@ void Movement<T>::movementController(const sf::Event& e)
     {
         if (e.key.code == sf::Keyboard::Left)
         {
-            this->left_key_pressed = true;
+            this->target->setLeftKeyPressed(true);
         }
         
         if (e.key.code == sf::Keyboard::Right)
         {
-            this->right_key_pressed = true;
+            this->target->setRightKeyPressed(true);
         }
         
-        if (e.key.code == sf::Keyboard::Space && touching_ground)
+        if (e.key.code == sf::Keyboard::Space && this->target->isTouchingGround())
         {
-            this->touching_ground = false;
-            this->jumping = true;
+            this->target->setTouchingGround(false);
+            this->target->setJumping(true);
         }
     }
 
@@ -90,17 +76,17 @@ void Movement<T>::movementController(const sf::Event& e)
     {
         if (e.key.code == sf::Keyboard::Left)
         {
-            this->left_key_pressed = false;
+            this->target->setLeftKeyPressed(false);
         }
         
         if (e.key.code == sf::Keyboard::Right)
         {
-            this->right_key_pressed = false;
+            this->target->setRightKeyPressed(false);
         }
          
         if (e.key.code == sf::Keyboard::Space )
         {
-            this->jumping = false;
+            this->target->setJumping(false);
         }
     }
 }
@@ -109,19 +95,18 @@ template<typename T>
 void Movement<T>::movement()
 {
     // MOVEMENTS
-    if (this->left_key_pressed && ( this->position.x - (this->velocity.x) >= this->x_left_constrains))
+    if (this->target->isLeftKeyPressed() && (this->target->getPosition().x - (this->target->getVelocity().x) >= this->x_left_constrains))
     {
-        this->position.x = this->position.x - (this->velocity.x);
+        this->target->setPosition(std::move(this->target->getPosition() - sf::Vector2f(this->target->getVelocity().x, 0) ));
     }
 
-    if (this->right_key_pressed && (this->position.x + (this->velocity.x) <= this->x_right_constrains))
+    if (this->target->isRightKeyPressed() && (this->target->getPosition().x + (this->target->getVelocity().x) <= this->x_right_constrains))
     {
-        this->position.x = this->position.x + (this->velocity.x);
+        this->target->setPosition(std::move(this->target->getPosition() + sf::Vector2f(this->target->getVelocity().x,0)));
     }
 
     this->isJumping();
 
-    this->target.setPosition(this->position);
 }
 
 
@@ -132,15 +117,7 @@ Movement<T>::Movement(T& target)
     this->y_botton_constrains = 560;
     this->x_left_constrains = 0;
     this->x_right_constrains = 1180;
-
-
-    this->position = sf::Vector2f(640.f, 560.f);
-    this->target = target;
-    //this->target.setSize(sf::Vector2f(100.f, 100.f));
-    this->target.setPosition(this->position);
-
-    this->velocity = sf::Vector2f(10.0f, 40.0f);
-    this->acceleration = sf::Vector2f(0, 9.8f);
+    this->target = &target;
 }
 
 template<typename T>

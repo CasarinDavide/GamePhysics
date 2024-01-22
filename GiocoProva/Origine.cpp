@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <math.h>
-#include "Movement.h"
+#include "Player.h"
 #include <iostream>
+#include <string>
 
-using namespace sf;
 
 
 void initGame();
@@ -18,65 +18,83 @@ void initGame()
 {
     // render finestra
 
-    Sprite player;
-    Sprite background;
-    Vector2u TextureSize;  //Added to store texture size.
-    Vector2u WindowSize;   //Added to store window size.
+    sf::Sprite background;
+    sf::Vector2u TextureSize;  //Added to store texture size.
+    sf::Vector2u WindowSize;   //Added to store window size.
 
-    RenderWindow window(VideoMode(1280, 720), "NOME FINESTRA");
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "NOME FINESTRA");
     window.setFramerateLimit(60);
-    RectangleShape rect;
+    sf::RectangleShape rect;
 
 
-    Texture texture;
-    if (!texture.loadFromFile("C:\\Users\\casar\\OneDrive\\Desktop\\background.png"))
+    sf::Texture texture;
+    if (!texture.loadFromFile("source/img/background.png"))
     {
         return;
     }
 
-    Texture player_texure;
-    if (!player_texure.loadFromFile("C:\\Users\\casar\\OneDrive\\Desktop\\player1.png"))
-    {
-        return;
-    }
+    
+        TextureSize = texture.getSize(); //Get size of texture.
+        WindowSize = window.getSize();             //Get size of window.
 
-    TextureSize = texture.getSize(); //Get size of texture.
-    WindowSize = window.getSize();             //Get size of window.
+        float ScaleX = (float)WindowSize.x / TextureSize.x;
+        float ScaleY = (float)WindowSize.y / TextureSize.y;     //Calculate scale.
 
-    float ScaleX = (float)WindowSize.x / TextureSize.x;
-    float ScaleY = (float)WindowSize.y / TextureSize.y;     //Calculate scale.
+        background.setTexture(texture);
+        background.setScale(ScaleX, ScaleY);
+        
+        /*
+        sf::Vector2i texture_pos(0.f, 0.f);
+        player.setTextureRect(sf::IntRect(texture_pos, sf::Vector2i(96.0f, 71.f)));
+        */
 
-    background.setTexture(texture);
-    background.setScale(ScaleX, ScaleY);
-    player.setTexture(player_texure);
-    player.setScale(0.1f, 0.1f);
+        Player pl(sf::Vector2f(3.f, 40.f), sf::Vector2f(0.f, 4.f), sf::Vector2f(300.f, 560.0f), std::string("source/img/zapdos_leftside.png"));
 
-    Movement<Sprite> mov(player);
-
-    while (window.isOpen())
-    {
-        Event event;
-        while (window.pollEvent(event))
+        while (window.isOpen())
         {
-            if (event.type == Event::Closed)
+            sf::Event event;
+            while (window.pollEvent(event))
             {
-                window.close();
+                if (event.type == sf::Event::Closed)
+                {
+                    window.close();
+                }
+
+                if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
+                    window.close();
+
+                // enable player movement by passing event
+                pl.playerAction(event);
+
             }
 
-            if ((event.type == Event::KeyPressed) && (event.key.code == Keyboard::Escape))
-                window.close();
+            pl.move();
 
-            // enable player movement by passing event
-            mov.movementController(event);
+        
+
+            /*
+            // Update texture position every frame
+            texture_pos.x += 96; // Increment x-coordinate by 96
+
+            // Reset x-coordinate and increment y-coordinate when reaching the end of the row
+            if (texture_pos.x >= 384)
+            {
+                texture_pos.x = 0;
+                texture_pos.y += 71;
+            }
+
+            // Reset to the beginning when reaching the end of the texture
+            if (texture_pos.y >= 142)
+            {
+                texture_pos = sf::Vector2i(0, 0);
+            }
+
+            player.setTextureRect(sf::IntRect(texture_pos, sf::Vector2i(96, 71)));
+            */
+
+            window.clear();
+            window.draw(background);
+            window.draw(pl.getSprite());
+            window.display();
         }
-
-        
-        mov.movement();
-        // render
-        
-        window.clear();
-        window.draw(background);
-        window.draw(mov.getTarget());
-        window.display();
-    }
 }

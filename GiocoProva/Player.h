@@ -2,6 +2,7 @@
 #include "Movement.h"
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "Animation.h"
 
 
 class Player
@@ -10,12 +11,16 @@ class Player
 		sf::Vector2f velocity;
 		sf::Vector2f acceleration;
 		sf::Vector2f position;
-		Movement<Player>* mov;
 		sf::Sprite *player_image;
 		bool touching_ground = true;
 		bool left_key_pressed = false;
 		bool right_key_pressed = false;
 		bool jumping = false;
+		sf::Vector2i img_box_size;
+		sf::Vector2i actual_box_position;
+		int numberOfSpriteRow;
+		int numberOfSpriteColum;
+
 
 
 	public:
@@ -42,6 +47,7 @@ class Player
 		sf::Sprite& getSprite();
 		void move();
 		/*TODO IMPLEMENT PLAYER ANIMATION*/
+		void changeAnimation();
 
 };
 

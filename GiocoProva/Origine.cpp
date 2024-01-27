@@ -25,6 +25,7 @@ void initGame()
     sf::RenderWindow window(sf::VideoMode(1280, 720), "NOME FINESTRA");
     window.setFramerateLimit(60);
     sf::RectangleShape rect;
+    sf::Clock clock;
 
 
     sf::Texture texture;
@@ -43,15 +44,14 @@ void initGame()
         background.setTexture(texture);
         background.setScale(ScaleX, ScaleY);
         
-        /*
-        sf::Vector2i texture_pos(0.f, 0.f);
-        player.setTextureRect(sf::IntRect(texture_pos, sf::Vector2i(96.0f, 71.f)));
-        */
+        
 
         Player pl(sf::Vector2f(3.f, 40.f), sf::Vector2f(0.f, 4.f), sf::Vector2f(300.f, 560.0f), std::string("source/img/zapdos_leftside.png"));
 
+        clock.restart();
         while (window.isOpen())
         {
+
             sf::Event event;
             while (window.pollEvent(event))
             {
@@ -68,33 +68,17 @@ void initGame()
 
             }
 
+
             pl.move();
 
         
 
-            /*
-            // Update texture position every frame
-            texture_pos.x += 96; // Increment x-coordinate by 96
-
-            // Reset x-coordinate and increment y-coordinate when reaching the end of the row
-            if (texture_pos.x >= 384)
-            {
-                texture_pos.x = 0;
-                texture_pos.y += 71;
-            }
-
-            // Reset to the beginning when reaching the end of the texture
-            if (texture_pos.y >= 142)
-            {
-                texture_pos = sf::Vector2i(0, 0);
-            }
-
-            player.setTextureRect(sf::IntRect(texture_pos, sf::Vector2i(96, 71)));
-            */
-
+           
             window.clear();
             window.draw(background);
             window.draw(pl.getSprite());
             window.display();
+
+           
         }
 }

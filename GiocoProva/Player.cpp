@@ -3,6 +3,7 @@
 #include "Movement.h" 
 
 
+/* TODO MAKE THE PLAYER INDIPENDENT FROM FRAMERATE*/
 Player::Player(sf::Vector2f velocity, sf::Vector2f acceleration, sf::Vector2f position, std::string path)
 {
 	sf::Texture* player_texture = new sf::Texture();
@@ -20,19 +21,23 @@ Player::Player(sf::Vector2f velocity, sf::Vector2f acceleration, sf::Vector2f po
 	sf::Vector2i texture_pos(0.f, 0.f);
 	this->player_image->setTextureRect(sf::IntRect(texture_pos, sf::Vector2i(96.0f, 71.f)));
 	this->player_image->setPosition(this->position);
-	this->mov = new Movement<Player>(*this); 
+	this->img_box_size = {96, 71};
+	this->actual_box_position = { 0,0 };
+	this->numberOfSpriteRow = 2;
+	this->numberOfSpriteColum = 5;
 
 }
 
 void Player::playerAction(sf::Event& event)
 {
-	this->mov->movementController(event);
+	Movement::movementController(event,*this);
+	
 }
-
 
 void Player::move()
 {
-	this->mov->movement();
+	Movement::movement(*this);
+	this->changeAnimation();
 }
 
 Player::Player(Player&& pl)
@@ -126,7 +131,6 @@ Player& Player::operator=(const Player& pl)
 		this->position = pl.position;
 		this->left_key_pressed = pl.left_key_pressed;
 		this->right_key_pressed = pl.right_key_pressed;
-		this->mov = pl.mov;
 		this->player_image = pl.player_image;
 	}
 
@@ -136,4 +140,10 @@ Player& Player::operator=(const Player& pl)
 sf::Sprite& Player::getSprite()
 {
 	return *this->player_image;
+}
+
+void Player::changeAnimation()
+{
+	Animation::UpdateTexture(*this, this->actual_box_position , this->img_box_size, this->numberOfSpriteRow, this->numberOfSpriteColum);
+	this->player_image->setTextureRect(sf::IntRect(this->actual_box_position, img_box_size));
 }

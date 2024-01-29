@@ -10,7 +10,7 @@ class Movement
         template<typename T>
         static void movementController(const sf::Event& e, T& target);
         template<typename T>
-        static void movement(T& target);
+        static void movement(T& target,float deltatime);
         template<typename T>
         static void makeEnemyFall(T& target);
 
@@ -54,12 +54,19 @@ static void Movement::movementController(const sf::Event& e,T& target)
     {
         if (e.key.code == sf::Keyboard::Left)
         {
-            target.setLeftKeyPressed(true);
+            if (!target.isLeftKeyPressed())
+            {
+                target.setLeftKeyPressed(true);
+            }
         }
         
         if (e.key.code == sf::Keyboard::Right)
         {
-            target.setRightKeyPressed(true);
+            if (!target.isRightKeyPressed())
+            {
+                target.setRightKeyPressed(true);
+            }
+            
         }
         
         if (e.key.code == sf::Keyboard::Space && target.isTouchingGround())
@@ -90,17 +97,17 @@ static void Movement::movementController(const sf::Event& e,T& target)
 }
 
 template<typename T>
-static void Movement::movement(T& target)
+static void Movement::movement(T& target, float deltatime)
 {
     // MOVEMENTS
     if (target.isLeftKeyPressed() && (target.getPosition().x - (target.getVelocity().x) >= Movement::x_left_constrains))
     {
-        target.setPosition(std::move(target.getPosition() - sf::Vector2f(target.getVelocity().x, 0) ));
+        target.setPosition(std::move(target.getPosition() - sf::Vector2f(target.getVelocity().x * deltatime * target.getPlayerSpeed(), 0)));
     }
 
     if (target.isRightKeyPressed() && (target.getPosition().x + (target.getVelocity().x) <= Movement::x_right_constrains))
     {
-        target.setPosition(std::move(target.getPosition() + sf::Vector2f(target.getVelocity().x,0)));
+        target.setPosition(std::move(target.getPosition() + sf::Vector2f(target.getVelocity().x * deltatime * target.getPlayerSpeed(),0)));
     }
 
     Movement::makeEnemyFall(target);

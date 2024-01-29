@@ -47,4 +47,12 @@
       <Filter>File di risorse</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="source\img\background.png">
+      <Filter>File di risorse</Filter>
+    </Image>
+    <Image Include="source\img\zapdos_animation.png">
+      <Filter>File di risorse</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

@@ -1,6 +1,4 @@
-
 #include "Player.h"
-#include "Movement.h" 
 
 
 /* TODO MAKE THE PLAYER INDIPENDENT FROM FRAMERATE*/
@@ -18,26 +16,36 @@ Player::Player(sf::Vector2f velocity, sf::Vector2f acceleration, sf::Vector2f po
 	this->player_image = new sf::Sprite();
 
 	this->player_image->setTexture(*player_texture);
-	sf::Vector2i texture_pos(0.f, 0.f);
+	sf::Vector2i texture_pos(0, 0);
 	this->player_image->setTextureRect(sf::IntRect(texture_pos, sf::Vector2i(96.0f, 71.f)));
 	this->player_image->setPosition(this->position);
 	this->img_box_size = {96, 71};
 	this->actual_box_position = { 0,0 };
-	this->numberOfSpriteRow = 2;
+	this->numberOfSpriteRow = 4;
 	this->numberOfSpriteColum = 5;
+	this->player_speed = 0.1f;
 
 }
 
 void Player::playerAction(sf::Event& event)
 {
 	Movement::movementController(event,*this);
+
 	
 }
 
-void Player::move()
-{
-	Movement::movement(*this);
-	this->changeAnimation();
+void Player::move(float deltatime)
+{	
+	if ( (this->isLeftKeyPressed() && this->player_image->getScale() != sf::Vector2f(-1,1))  || 
+		 (this->isRightKeyPressed() && this->player_image->getScale() != sf::Vector2f(1, 1))    )
+	{
+
+		/* TODO CHANGE BUGGY ANIMATION WHEN SWAP FROM LEFT TO RIGHT OR VICEVERSA */
+		this->player_image->setScale(Animation::flipTexture(*this));
+	}
+
+	Movement::movement(*this, deltatime);
+	this->changeAnimation(deltatime);
 }
 
 Player::Player(Player&& pl)
@@ -67,6 +75,11 @@ void Player::setVelocity(const sf::Vector2f& velocity)
 const sf::Vector2f& Player::getAcceleration()
 {
 	return this->acceleration;
+}
+
+const float& Player::getPlayerSpeed()
+{
+	return this->player_speed;
 }
 
 void Player::setAcceleration(const sf::Vector2f& acceleration)
@@ -142,8 +155,14 @@ sf::Sprite& Player::getSprite()
 	return *this->player_image;
 }
 
-void Player::changeAnimation()
+void Player::changeAnimation(float deltatime)
 {
-	Animation::UpdateTexture(*this, this->actual_box_position , this->img_box_size, this->numberOfSpriteRow, this->numberOfSpriteColum);
-	this->player_image->setTextureRect(sf::IntRect(this->actual_box_position, img_box_size));
+	last_deltatime += deltatime;
+	if (last_deltatime >= 100)
+	{
+		Animation::UpdateTexture(*this, this->actual_box_position, this->img_box_size, this->numberOfSpriteRow, this->numberOfSpriteColum);
+		this->player_image->setTextureRect(sf::IntRect(this->actual_box_position, img_box_size));
+		last_deltatime = deltatime;
+		last_deltatime = 0;
+	}	
 }

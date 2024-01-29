@@ -26,7 +26,9 @@ void initGame()
     window.setFramerateLimit(60);
     sf::RectangleShape rect;
     sf::Clock clock;
+    sf::Time deltatime;
 
+    clock.restart();
 
     sf::Texture texture;
     if (!texture.loadFromFile("source/img/background.png"))
@@ -46,12 +48,12 @@ void initGame()
         
         
 
-        Player pl(sf::Vector2f(3.f, 40.f), sf::Vector2f(0.f, 4.f), sf::Vector2f(300.f, 560.0f), std::string("source/img/zapdos_leftside.png"));
+        Player pl(sf::Vector2f(3.f, 40.f), sf::Vector2f(0.f, 4.f), sf::Vector2f(300.f, 560.0f), std::string("source/img/zapdos_animation.png"));
 
-        clock.restart();
+        
         while (window.isOpen())
         {
-
+           
             sf::Event event;
             while (window.pollEvent(event))
             {
@@ -65,13 +67,13 @@ void initGame()
 
                 // enable player movement by passing event
                 pl.playerAction(event);
+                window.draw(pl.getSprite());
 
             }
 
-
-            pl.move();
-
-        
+            deltatime = clock.restart();
+            float deltatimeF = deltatime.asMilliseconds();
+            pl.move(deltatimeF);
 
            
             window.clear();
@@ -79,6 +81,5 @@ void initGame()
             window.draw(pl.getSprite());
             window.display();
 
-           
         }
 }

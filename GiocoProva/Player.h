@@ -4,6 +4,8 @@
 #include <string>
 #include "Animation.h"
 
+#include <iostream>
+
 
 class Player
 {
@@ -12,6 +14,7 @@ class Player
 		sf::Vector2f acceleration;
 		sf::Vector2f position;
 		sf::Sprite *player_image;
+		float player_speed;
 		bool touching_ground = true;
 		bool left_key_pressed = false;
 		bool right_key_pressed = false;
@@ -20,7 +23,7 @@ class Player
 		sf::Vector2i actual_box_position;
 		int numberOfSpriteRow;
 		int numberOfSpriteColum;
-
+		float last_deltatime;
 
 
 	public:
@@ -29,6 +32,7 @@ class Player
 		Player(Player&& pl);
 		Player();
 		const sf::Vector2f& getVelocity();
+		const float& getPlayerSpeed();
 		void setVelocity(const sf::Vector2f& velocity);
 		const sf::Vector2f& getAcceleration();
 		void setAcceleration(const sf::Vector2f& acceleration);
@@ -45,9 +49,8 @@ class Player
 		void playerAction(sf::Event& event);
 		Player& operator=(const Player& pl);
 		sf::Sprite& getSprite();
-		void move();
-		/*TODO IMPLEMENT PLAYER ANIMATION*/
-		void changeAnimation();
+		void move(float deltatime);
+		void changeAnimation(float deltatime);
 
 };
 
